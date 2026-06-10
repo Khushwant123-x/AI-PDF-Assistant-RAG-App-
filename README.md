@@ -241,7 +241,7 @@ MISTRAL_API_KEY=your_api_key_here
 ## ▶️ Run Project
 
 ```bash
-python app.py
+streamlit run app.py
 ```
 
 ---
