@@ -1,48 +1,147 @@
-# 📄 RAG-Based PDF Question Answering System
+# 📄 AI-Powered RAG PDF Question Answering System
 
-A Retrieval-Augmented Generation (RAG) application that enables users to ask questions from PDF documents and receive context-aware answers grounded in the document content.
+## 🚀 Overview
 
-Built using LangChain, ChromaDB, Hugging Face Embeddings, and Mistral AI, the system retrieves the most relevant document chunks before generating responses, reducing hallucinations and improving answer accuracy.
+This project is a **Retrieval-Augmented Generation (RAG) based Question Answering System** that allows users to upload PDF documents and ask natural language questions. The system retrieves relevant context from the document and uses a Large Language Model (Mistral AI) to generate accurate, grounded responses.
 
----
-
-## 🚀 Features
-
-* PDF document ingestion and processing
-* Semantic search using transformer-based embeddings
-* Persistent vector storage with ChromaDB
-* MMR (Maximal Marginal Relevance) retrieval for diversified context
-* Context-grounded question answering
-* Hallucination reduction through retrieval augmentation
-* Interactive command-line chat interface
+Instead of directly asking the LLM (which may hallucinate), this system first retrieves relevant document chunks, ensuring **factual, context-based answers**.
 
 ---
 
-## 🛠️ Tech Stack
+## 🧠 What is RAG?
 
-* **Programming Language:** Python
-* **Framework:** LangChain
-* **LLM:** Mistral Small 2506
-* **Embedding Model:** BAAI/bge-small-en-v1.5
-* **Vector Database:** ChromaDB
-* **Environment Management:** Python Dotenv
+**Retrieval-Augmented Generation (RAG)** is a hybrid AI approach that combines:
 
----
+* 🔎 **Information Retrieval** (searching relevant document content)
+* 🤖 **Large Language Models** (generating human-like responses)
 
-## 📂 System Architecture
+### 👉 Why RAG?
 
-1. Load PDF documents.
-2. Split documents into manageable text chunks.
-3. Generate vector embeddings using BGE embeddings.
-4. Store embeddings in ChromaDB.
-5. Retrieve relevant chunks using MMR search.
-6. Inject retrieved context into a prompt template.
-7. Generate grounded responses using Mistral AI.
-8. Return answers to the user.
+* Reduces hallucination
+* Uses real document knowledge
+* Improves factual accuracy
+* Scales to large datasets (PDFs, docs, etc.)
 
 ---
 
-## 🔍 Retrieval Configuration
+## ⚙️ System Architecture (End-to-End Flow)
+
+```
+PDF Document
+    ↓
+Text Extraction
+    ↓
+Chunking (Text Splitting)
+    ↓
+Embedding Generation (HuggingFace BGE Model)
+    ↓
+Vector Storage (ChromaDB)
+    ↓
+User Question Input
+    ↓
+Question Embedding
+    ↓
+Similarity Search (MMR Retrieval)
+    ↓
+Relevant Context Retrieval
+    ↓
+Prompt Construction
+    ↓
+Mistral LLM (Response Generation)
+    ↓
+Final Answer
+```
+
+---
+
+
+## 📂 Step-by-Step Pipeline Explanation
+
+---
+
+### 📄 1. PDF Loading & Text Extraction
+
+The system first loads PDF files and extracts raw text using document loaders.
+
+* Converts PDF → text format
+* Removes structural noise
+* Prepares content for processing
+
+---
+
+### ✂️ 2. Text Chunking (Important Step)
+
+Since LLMs cannot process large documents at once, text is split into **smaller overlapping chunks**.
+
+#### Why chunking?
+
+* Maintains context continuity
+* Improves retrieval accuracy
+* Helps embedding models perform better
+
+Example:
+
+```
+Chunk 1: Paragraph 1-2
+Chunk 2: Paragraph 2-3 (overlap)
+Chunk 3: Paragraph 3-4
+```
+
+---
+
+### 🧠 3. Embedding Generation (Hugging Face Model)
+
+Each text chunk is converted into a **high-dimensional vector representation**.
+
+```python
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding = HuggingFaceEmbeddings(
+    model_name="BAAI/bge-small-en-v1.5"
+)
+```
+
+#### What embeddings do?
+
+* Convert text → numeric vectors
+* Capture semantic meaning
+* Enable similarity search
+
+---
+
+### 🗃️ 4. Vector Database (ChromaDB)
+
+All embeddings are stored in **ChromaDB**, a persistent vector database.
+
+#### Why vector DB?
+
+* Fast similarity search
+* Scalable storage
+* Efficient retrieval of relevant chunks
+
+Each chunk is stored as:
+
+```
+{ text_chunk → embedding_vector }
+```
+
+---
+
+### 🔍 5. Question Processing (Query Embedding)
+
+When user asks a question:
+
+```
+User Question → Embedding Model → Question Vector
+```
+
+Now the question is also converted into the same vector space.
+
+---
+
+### 🔎 6. Similarity Search (MMR Retrieval)
+
+The system retrieves the most relevant chunks using:
 
 ```python
 search_type = "mmr"
@@ -54,73 +153,148 @@ search_kwargs = {
 }
 ```
 
+#### MMR (Maximal Marginal Relevance):
+
+Balances:
+
+* 🎯 Relevance (to query)
+* 🔄 Diversity (avoid repetition)
+
+---
+
+### 📦 7. Context Construction
+
+Retrieved chunks are combined into a **context window**:
+
+```
+Context = Top relevant document chunks
+```
+
+This context is then injected into the prompt.
+
+---
+
+### 🤖 8. LLM Response Generation (Mistral AI)
+
+The final step uses **Mistral Small (via API)**.
+
+The prompt looks like:
+
+```
+Context: <retrieved document chunks>
+
+Question: <user query>
+
+Answer:
+```
+
+#### Why Mistral?
+
+* Fast inference
+* High-quality reasoning
+* Cost-efficient
+* Strong open-weight LLM
+
+---
+
+### 💬 9. Final Answer Output
+
+The model generates a:
+
+* Context-aware answer
+* Grounded in PDF content
+* Reduced hallucination response
+
+---
+
+## 🧠 Tech Stack
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge\&logo=python\&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-121D33?style=for-the-badge)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-3B82F6?style=for-the-badge)
+![Mistral AI](https://img.shields.io/badge/Mistral%20AI-FF6B6B?style=for-the-badge)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-yellow?style=for-the-badge)
+
 ---
 
 ## 📦 Installation
 
-### Clone Repository
-
 ```bash
-git clone https://github.com/yourusername/rag-pdf-qa-system.git
-cd rag-pdf-qa-system
-```
-
-### Install Dependencies
-
-```bash
+git clone https://github.com/Khushwant123-x/AI-PDF-Assistant-RAG-App-.git
+cd AI-PDF-Assistant-RAG-App-
 pip install -r requirements.txt
 ```
 
-### Configure Environment Variables
+---
 
-Create a `.env` file:
+## 🔐 Environment Setup
+
+Create `.env` file:
 
 ```env
-MISTRAL_API_KEY=your_api_key
+MISTRAL_API_KEY=your_api_key_here
 ```
 
 ---
 
-## ▶️ Run the Application
+## ▶️ Run Project
 
 ```bash
-python rag.py
+python app.py
 ```
 
 ---
 
-## 💻 Example Interaction
+## 💡 Example Use Case
 
-```text
-You: What is Retrieval-Augmented Generation?
+### Input:
 
-AI: Retrieval-Augmented Generation (RAG) is a technique that combines information retrieval with large language models to generate accurate, context-aware responses using external knowledge sources.
+```
+What is Retrieval-Augmented Generation?
+```
+
+### Output:
+
+```
+Retrieval-Augmented Generation (RAG) is a technique that combines document retrieval with large language models to generate accurate, context-aware answers using external knowledge sources.
 ```
 
 ---
 
-## 🎯 Future Enhancements
+## 🎯 Key Features
 
-* Streamlit-based web interface
-* FastAPI deployment
-* Multi-PDF support
-* Source citations and references
-* Conversational memory
-* Hybrid retrieval (BM25 + Semantic Search)
-* Cloud deployment (AWS/GCP/Azure)
+* 📄 PDF-based knowledge ingestion
+* 🧠 Semantic search using embeddings
+* 🔎 MMR-based retrieval system
+* 🗃️ Vector database storage (ChromaDB)
+* 🤖 Mistral LLM integration
+* ⚡ Reduced hallucinations
+* 💬 CLI-based chat interface
+
+---
+
+## 🚀 Future Improvements
+
+* 🌐 Streamlit web UI
+* ⚡ FastAPI backend
+* 📚 Multi-PDF upload support
+* 🔗 Source citation (page-level grounding)
+* 💾 Chat memory (conversational RAG)
+* ☁️ Cloud deployment (AWS/GCP/Azure)
+* 🔎 Hybrid search (BM25 + semantic)
 
 ---
 
 ## 📈 Skills Demonstrated
 
 * Retrieval-Augmented Generation (RAG)
-* Vector Databases
-* Semantic Search
+* Vector Databases (ChromaDB)
+* Embedding Models (HuggingFace BGE)
 * Prompt Engineering
+* LLM Integration (Mistral AI)
 * LangChain Framework
-* LLM Integration
-* Embedding Models
-* Information Retrieval
+* Information Retrieval Systems
+* NLP Pipeline Design
 
 ---
 
@@ -128,5 +302,12 @@ AI: Retrieval-Augmented Generation (RAG) is a technique that combines informatio
 
 **Khushwant Singh Rajat**
 
-Aspiring AI Engineer passionate about Generative AI, Retrieval-Augmented Generation (RAG), Machine Learning, and Large Language Model applications.
+Aspiring AI Engineer focused on Generative AI, LLM applications, and Retrieval-Augmented Generation systems.
+
+---
+
+## ⭐ Final Note
+
+This project demonstrates how Large Language Models can be enhanced with external knowledge sources using **RAG architecture**, significantly improving accuracy, reliability, and real-world usability.
+
 
