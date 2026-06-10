@@ -29,7 +29,6 @@ retriever = vectorstore.as_retriever(
 
 llm = ChatMistralAI(model = "mistral-small-2506")
 
-#prompt template 
 prompt = ChatPromptTemplate.from_messages(
     [
         (
