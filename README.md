@@ -51,6 +51,7 @@ Mistral LLM (Response Generation)
     ↓
 Final Answer
 ```
+![RAG System Architecture](architecture.png)
 
 ---
 
